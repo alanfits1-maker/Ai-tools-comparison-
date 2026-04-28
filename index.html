@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Tools Comparison Hub</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#1a1a1a;background:#f5f5f3;min-height:100vh}
+.container{max-width:1200px;margin:0 auto;padding:0 24px 80px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.page{display:none}.page.active{display:block}
+h1{font-size:22px;font-weight:600;margin-bottom:4px;color:#111}
+.sub{font-size:14px;color:#666;margin-bottom:1.25rem}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#888;margin-bottom:10px}
+
+/* Top picks */
+.picks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2rem}
+.pick-card{background:#fff;border:1px solid #e5e5e3;border-radius:10px;padding:.9rem 1rem;display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.pick-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+.pick-body{flex:1;min-width:0}
+.pick-name{font-size:13px;font-weight:600;margin-bottom:2px;color:#111}
+.pick-reason{font-size:11px;color:#666;line-height:1.4}
+.pick-tag{font-size:10px;padding:1px 6px;border-radius:8px;display:inline-block;margin-top:4px;font-weight:500}
+
+/* Controls */
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1rem;align-items:center}
+.controls select,.controls input{font-size:13px;padding:6px 10px;border-radius:7px;border:1px solid #ddd;background:#fff;color:#1a1a1a;height:34px;outline:none}
+.controls select:focus,.controls input:focus{border-color:#aaa}
+.controls input{flex:1;min-width:140px}
+.count{font-size:13px;color:#888;margin-left:auto}
+.btn{font-size:13px;padding:6px 14px;border-radius:7px;border:1px solid #ddd;background:#fff;color:#1a1a1a;cursor:pointer;height:34px;white-space:nowrap}
+.btn:hover{background:#f0f0ee}
+
+/* Table */
+.tbl-wrap{overflow-x:auto;margin-bottom:1.5rem;border:1px solid #e5e5e3;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:700px}
+thead tr{background:#f9f9f7}
+th{padding:9px 12px;text-align:left;font-weight:600;font-size:11px;color:#888;border-bottom:1px solid #e5e5e3;white-space:nowrap}
+th.chk{width:36px;text-align:center}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:#333}
+th.sort-asc .sort-icon::after{content:'↑';margin-left:4px;color:#333}
+th.sort-desc .sort-icon::after{content:'↓';margin-left:4px;color:#333}
+th.sortable:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'↕';margin-left:4px;opacity:.3}
+td{padding:9px 12px;border-bottom:1px solid #f0f0ee;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.selected-row{background:#EEF4FF}
+tr:not(.selected-row):hover td{background:#fafaf8}
+td.chk{text-align:center}
+.chk-box{width:16px;height:16px;border:1px solid #ccc;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#fff}
+.chk-box.on{background:#3B7BF5;border-color:#3B7BF5;color:#fff;font-size:11px}
+.tool-cell{display:flex;align-items:center;gap:8px}
+.tool-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tool-name-tbl{font-size:13px;font-weight:600;color:#111}
+.stars-sm{font-size:11px;letter-spacing:.5px}
+.badge-sm{font-size:10px;padding:2px 7px;border-radius:10px;white-space:nowrap;font-weight:500}
+.visit-link{font-size:11px;color:#3B7BF5;text-decoration:none}
+.visit-link:hover{text-decoration:underline}
+.empty-row td{text-align:center;padding:2rem;color:#888}
+
+/* Compare bar */
+.compare-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e5e3;padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 -2px 8px rgba(0,0,0,.06);z-index:50}
+.compare-bar>span{font-size:13px;color:#888}
+.compare-chips{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.chip{font-size:12px;padding:3px 10px;border-radius:12px;background:#EEF4FF;color:#3B7BF5;display:flex;align-items:center;gap:4px;font-weight:500}
+.chip button{background:none;border:none;cursor:pointer;color:#3B7BF5;font-size:14px;line-height:1;padding:0}
+.compare-btn{font-size:13px;padding:6px 16px;border-radius:7px;background:#3B7BF5;color:#fff;border:none;cursor:pointer;font-weight:500}
+.compare-btn:hover{background:#2d6ce0}
+.compare-btn:disabled{opacity:.4;cursor:default}
+
+/* Compare page */
+.comp-header{display:flex;align-items:center;gap:14px;padding:1.5rem 0 1rem}
+.back-btn{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px 14px;border-radius:7px;border:1px solid #ddd;background:#fff;color:#333;cursor:pointer;font-weight:500}
+.back-btn:hover{background:#f0f0ee}
+.comp-card{background:#fff;border:1px solid #e5e5e3;border-radius:10px;overflow:hidden;margin-bottom:2rem;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.comp-card-head{display:grid}
+.comp-head-cell{padding:1rem 1.25rem;border-right:1px solid #e5e5e3}
+.comp-head-cell:last-child{border-right:none}
+.comp-row-label{font-size:11px;font-weight:600;color:#888;padding:9px 1.25rem;background:#f9f9f7;border-top:1px solid #e5e5e3;border-bottom:1px solid #e5e5e3;text-transform:uppercase;letter-spacing:.06em}
+.comp-row-values{display:grid}
+.comp-cell{padding:10px 1.25rem;font-size:13px;border-right:1px solid #f0f0ee;border-bottom:1px solid #f0f0ee}
+.comp-cell:last-child{border-right:none}
+
+/* Header bar */
+.site-header{background:#fff;border-bottom:1px solid #e5e5e3;padding:14px 24px;display:flex;align-items:center;gap:10px;margin-bottom:0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.site-logo{width:28px;height:28px;background:linear-gradient(135deg,#3B7BF5,#8B5CF6);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px}
+.site-title{font-size:15px;font-weight:700;color:#111}
+.site-sub{font-size:12px;color:#888;margin-left:auto}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="site-logo">🤖</div>
+  <span class="site-title">AI Tools Comparison Hub</span>
+  <span class="site-sub">18 tools · free tier only</span>
+</div>
+
+<div class="container">
+
+<!-- Main page -->
+<div class="page active" id="mainPage">
+  <div style="padding:1.5rem 0 .75rem">
+    <h1>Find the right AI tool for you</h1>
+    <p class="sub">Browse, filter, and compare the best free AI tools across every domain.</p>
+
+    <div class="section-label">⭐ Top picks</div>
+    <div class="picks-grid" id="picksGrid"></div>
+
+    <div class="section-label">All tools</div>
+    <div class="controls">
+      <input type="text" id="search" placeholder="Search tools...">
+      <select id="domainFilter">
+        <option value="">All domains</option>
+        <option>Writing</option><option>Coding</option><option>Image Gen</option>
+        <option>Research</option><option>Productivity</option><option>Video</option>
+        <option>Audio</option><option>Data</option>
+      </select>
+      <select id="skillFilter">
+        <option value="">All skill levels</option>
+        <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+      </select>
+      <select id="tierFilter">
+        <option value="">All free tiers</option>
+        <option>Fully Free</option><option>Generous</option><option>Basic</option>
+      </select>
+      <span class="count" id="countLabel"></span>
+    </div>
+
+    <div class="tbl-wrap">
+      <table id="toolTable">
+        <thead>
+          <tr>
+            <th class="chk"></th>
+            <th class="sortable" data-col="name">Tool<span class="sort-icon"></span></th>
+            <th class="sortable" data-col="domain">Domain<span class="sort-icon"></span></th>
+            <th class="sortable" data-col="ease">Ease of use<span class="sort-icon"></span></th>
+            <th class="sortable" data-col="skill">Skill level<span class="sort-icon"></span></th>
+            <th class="sortable" data-col="tier">Free tier<span class="sort-icon"></span></th>
+            <th class="sortable" data-col="users">Weekly users<span class="sort-icon"></span></th>
+            <th>About</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="compare-bar" id="compareBar" style="display:none">
+    <span>Compare:</span>
+    <div class="compare-chips" id="chips"></div>
+    <button class="compare-btn" id="compareBtn" disabled>Compare selected</button>
+    <button class="btn" id="clearCompare">Clear</button>
+  </div>
+</div>
+
+<!-- Compare page -->
+<div class="page" id="comparePage">
+  <div class="comp-header">
+    <button class="back-btn" id="backBtn">← Back to tools</button>
+    <h1 id="compTitle" style="font-size:20px;font-weight:600"></h1>
+  </div>
+  <p style="font-size:14px;color:#888;margin-bottom:1.5rem" id="compSubtitle"></p>
+  <div id="compContent"></div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+const domainColors={Writing:{bg:'#E6F1FB',text:'#0C447C',dot:'#378ADD'},Coding:{bg:'#EAF3DE',text:'#3B6D11',dot:'#639922'},'Image Gen':{bg:'#FBEAF0',text:'#72243E',dot:'#D4537E'},Research:{bg:'#EEEDFE',text:'#3C3489',dot:'#7F77DD'},Productivity:{bg:'#FAEEDA',text:'#633806',dot:'#BA7517'},Video:{bg:'#FAECE7',text:'#712B13',dot:'#D85A30'},Audio:{bg:'#E1F5EE',text:'#085041',dot:'#1D9E75'},Data:{bg:'#F1EFE8',text:'#444441',dot:'#888780'}};
+const skillColors={Beginner:{bg:'#EAF3DE',text:'#3B6D11'},Intermediate:{bg:'#FAEEDA',text:'#633806'},Advanced:{bg:'#FCEBEB',text:'#791F1F'}};
+const tierColors={'Fully Free':{bg:'#EAF3DE',text:'#3B6D11'},Generous:{bg:'#E6F1FB',text:'#0C447C'},Basic:{bg:'#F1EFE8',text:'#5F5E5A'}};
+
+const tools=[
+  {name:'ChatGPT',domain:'Writing',desc:'Versatile conversational AI for writing, brainstorming, and Q&A.',ease:5,skill:'Beginner',tier:'Generous',url:'https://chat.openai.com',users:'100M+/wk'},
+  {name:'Claude',domain:'Writing',desc:'Long-context AI excelling at nuanced writing, analysis and coding.',ease:5,skill:'Beginner',tier:'Generous',url:'https://claude.ai',users:'10M+/wk'},
+  {name:'Gemini',domain:'Research',desc:"Google's AI with deep search integration and multimodal inputs.",ease:5,skill:'Beginner',tier:'Generous',url:'https://gemini.google.com',users:'30M+/wk'},
+  {name:'Perplexity',domain:'Research',desc:'AI-powered search engine with cited, real-time web answers.',ease:4,skill:'Beginner',tier:'Generous',url:'https://www.perplexity.ai',users:'15M+/wk'},
+  {name:'Copilot',domain:'Coding',desc:"GitHub's AI pair programmer for autocomplete and code generation.",ease:4,skill:'Intermediate',tier:'Basic',url:'https://github.com/features/copilot',users:'20M+/wk'},
+  {name:'DALL·E 3',domain:'Image Gen',desc:"OpenAI's image generator built into ChatGPT for prompt-based art.",ease:5,skill:'Beginner',tier:'Basic',url:'https://openai.com/dall-e-3',users:'10M+/wk'},
+  {name:'Midjourney',domain:'Image Gen',desc:'High-quality artistic image generation via Discord or web.',ease:3,skill:'Intermediate',tier:'Basic',url:'https://www.midjourney.com',users:'18M+/wk'},
+  {name:'Stable Diffusion',domain:'Image Gen',desc:'Open-source image model, highly customisable and self-hostable.',ease:2,skill:'Advanced',tier:'Fully Free',url:'https://stability.ai',users:'5M+/wk'},
+  {name:'Runway',domain:'Video',desc:'AI video generation and editing with text-to-video capabilities.',ease:3,skill:'Intermediate',tier:'Basic',url:'https://runwayml.com',users:'3M+/wk'},
+  {name:'Suno',domain:'Audio',desc:'AI music generator — create full songs from text prompts.',ease:5,skill:'Beginner',tier:'Generous',url:'https://suno.ai',users:'6M+/wk'},
+  {name:'ElevenLabs',domain:'Audio',desc:'Hyper-realistic AI voice cloning and text-to-speech.',ease:4,skill:'Beginner',tier:'Generous',url:'https://elevenlabs.io',users:'4M+/wk'},
+  {name:'Gamma',domain:'Productivity',desc:'AI-powered presentation and document builder with one prompt.',ease:5,skill:'Beginner',tier:'Generous',url:'https://gamma.app',users:'4M+/wk'},
+  {name:'Notion AI',domain:'Productivity',desc:'AI writing and summarisation built into Notion workspaces.',ease:4,skill:'Beginner',tier:'Basic',url:'https://notion.so',users:'8M+/wk'},
+  {name:'Julius',domain:'Data',desc:'AI data analyst — upload CSVs and get instant charts and insights.',ease:4,skill:'Intermediate',tier:'Generous',url:'https://julius.ai',users:'500K+/wk'},
+  {name:'Cursor',domain:'Coding',desc:'AI-native code editor built on VS Code with deep codebase context.',ease:3,skill:'Intermediate',tier:'Generous',url:'https://cursor.sh',users:'2M+/wk'},
+  {name:'DeepL',domain:'Writing',desc:'Industry-leading AI translation with nuanced, natural results.',ease:5,skill:'Beginner',tier:'Generous',url:'https://deepl.com',users:'12M+/wk'},
+  {name:'Otter.ai',domain:'Productivity',desc:'AI meeting transcription and summary for calls and recordings.',ease:5,skill:'Beginner',tier:'Generous',url:'https://otter.ai',users:'2M+/wk'},
+  {name:'Pika',domain:'Video',desc:'Text and image to video AI for quick, shareable clips.',ease:4,skill:'Beginner',tier:'Generous',url:'https://pika.art',users:'1M+/wk'},
+];
+
+const picks=[
+  {name:'ChatGPT',tag:'Most popular',reason:'Best all-rounder for everyday tasks — massive free tier and user base.',tagBg:'#E6F1FB',tagText:'#0C447C',iconBg:'#E6F1FB',iconText:'#0C447C'},
+  {name:'Perplexity',tag:'Best for research',reason:'Real-time web search with cited answers — perfect for quick fact-finding.',tagBg:'#EEEDFE',tagText:'#3C3489',iconBg:'#EEEDFE',iconText:'#3C3489'},
+  {name:'Midjourney',tag:'Best image gen',reason:'Produces the most visually stunning images of any free-tier AI tool.',tagBg:'#FBEAF0',tagText:'#72243E',iconBg:'#FBEAF0',iconText:'#72243E'},
+  {name:'Cursor',tag:'Best for coding',reason:'AI-native editor with full codebase context — transforms developer workflow.',tagBg:'#EAF3DE',tagText:'#3B6D11',iconBg:'#EAF3DE',iconText:'#3B6D11'},
+  {name:'Suno',tag:'Best for audio',reason:'Create full, polished songs from a text prompt in seconds.',tagBg:'#E1F5EE',tagText:'#085041',iconBg:'#E1F5EE',iconText:'#085041'},
+  {name:'Gamma',tag:'Best productivity',reason:'Turn a one-line prompt into a beautiful presentation or doc instantly.',tagBg:'#FAEEDA',tagText:'#633806',iconBg:'#FAEEDA',iconText:'#633806'},
+];
+
+let selected=[];
+let sortCol=null,sortDir=1;
+const skillOrder={Beginner:1,Intermediate:2,Advanced:3};
+const tierOrder={'Fully Free':3,Generous:2,Basic:1};
+function parseUsers(s){return parseInt(s.replace(/[^0-9]/g,''))||0;}
+function sortTools(arr){
+  if(!sortCol)return arr;
+  return [...arr].sort((a,b)=>{
+    if(sortCol==='name'){const av=a.name.toLowerCase(),bv=b.name.toLowerCase();return sortDir*(av<bv?-1:av>bv?1:0);}
+    if(sortCol==='domain'){return sortDir*(a.domain<b.domain?-1:a.domain>b.domain?1:0);}
+    if(sortCol==='ease')return sortDir*(a.ease-b.ease);
+    if(sortCol==='skill')return sortDir*(skillOrder[a.skill]-skillOrder[b.skill]);
+    if(sortCol==='tier')return sortDir*(tierOrder[a.tier]-tierOrder[b.tier]);
+    if(sortCol==='users')return sortDir*(parseUsers(a.users)-parseUsers(b.users));
+    return 0;
+  });
+}
+
+function stars(n){return `<span style="color:#e29c1e">${'★'.repeat(n)}</span><span style="color:#ddd">${'☆'.repeat(5-n)}</span>`;}
+function badge(t,c){return `<span class="badge-sm" style="background:${c.bg};color:${c.text}">${t}</span>`;}
+function initials(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();}
+
+function renderPicks(){
+  document.getElementById('picksGrid').innerHTML=picks.map(p=>`
+    <div class="pick-card">
+      <div class="pick-icon" style="background:${p.iconBg};color:${p.iconText}">${initials(p.name)}</div>
+      <div class="pick-body">
+        <div class="pick-name">${p.name}</div>
+        <div class="pick-reason">${p.reason}</div>
+        <span class="pick-tag" style="background:${p.tagBg};color:${p.tagText}">${p.tag}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderTable(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const dom=document.getElementById('domainFilter').value;
+  const skill=document.getElementById('skillFilter').value;
+  const tier=document.getElementById('tierFilter').value;
+  const filtered=sortTools(tools.filter(t=>{
+    if(q&&!t.name.toLowerCase().includes(q)&&!t.desc.toLowerCase().includes(q)&&!t.domain.toLowerCase().includes(q))return false;
+    if(dom&&t.domain!==dom)return false;
+    if(skill&&t.skill!==skill)return false;
+    if(tier&&t.tier!==tier)return false;
+    return true;
+  }));
+  document.getElementById('countLabel').textContent=`${filtered.length} tool${filtered.length!==1?'s':''}`;
+  document.querySelectorAll('th.sortable').forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    if(th.dataset.col===sortCol)th.classList.add(sortDir===1?'sort-asc':'sort-desc');
+  });
+  const tb=document.getElementById('tableBody');
+  if(!filtered.length){tb.innerHTML='<tr class="empty-row"><td colspan="9">No tools match your filters.</td></tr>';return;}
+  tb.innerHTML=filtered.map(t=>{
+    const sel=selected.includes(t.name);
+    const dc=domainColors[t.domain]||{bg:'#F1EFE8',text:'#444441',dot:'#888780'};
+    return `<tr class="${sel?'selected-row':''}" onclick="toggleSelect('${t.name}')" style="cursor:pointer">
+      <td class="chk"><div class="chk-box${sel?' on':''}">${sel?'✓':''}</div></td>
+      <td><div class="tool-cell"><div class="tool-dot" style="background:${dc.dot}"></div><span class="tool-name-tbl">${t.name}</span></div></td>
+      <td>${badge(t.domain,dc)}</td>
+      <td>${stars(t.ease)}</td>
+      <td>${badge(t.skill,skillColors[t.skill])}</td>
+      <td>${badge(t.tier,tierColors[t.tier])}</td>
+      <td style="font-size:12px;font-weight:600">${t.users}</td>
+      <td style="font-size:11px;color:#666;max-width:180px;line-height:1.4">${t.desc}</td>
+      <td><a class="visit-link" href="${t.url}" target="_blank" onclick="event.stopPropagation()">Visit ↗</a></td>
+    </tr>`;
+  }).join('');
+}
+
+function toggleSelect(name){
+  const i=selected.indexOf(name);
+  if(i>-1)selected.splice(i,1);
+  else if(selected.length<3)selected.push(name);
+  renderCompareBar();renderTable();
+}
+
+function renderCompareBar(){
+  const bar=document.getElementById('compareBar');
+  if(!selected.length){bar.style.display='none';return;}
+  bar.style.display='flex';
+  document.getElementById('chips').innerHTML=selected.map(n=>`<span class="chip">${n}<button onclick="event.stopPropagation();toggleSelect('${n}')" title="Remove">×</button></span>`).join('');
+  document.getElementById('compareBtn').disabled=selected.length<2;
+}
+
+function openComparePage(){
+  const t2=tools.filter(t=>selected.includes(t.name));
+  const cols=t2.length,colW=`repeat(${cols},1fr)`;
+  document.getElementById('compTitle').textContent=t2.map(t=>t.name).join(' vs ');
+  document.getElementById('compSubtitle').textContent=`Side-by-side comparison across ${cols} tools`;
+  const rows=[
+    {label:'Domain',fn:t=>badge(t.domain,domainColors[t.domain]||{bg:'#F1EFE8',text:'#444441'})},
+    {label:'Ease of use',fn:t=>stars(t.ease)},
+    {label:'Skill level',fn:t=>badge(t.skill,skillColors[t.skill])},
+    {label:'Free tier',fn:t=>badge(t.tier,tierColors[t.tier])},
+    {label:'Weekly users',fn:t=>`<strong>${t.users}</strong>`},
+    {label:'Description',fn:t=>`<span style="font-size:12px;color:#666;line-height:1.5">${t.desc}</span>`},
+    {label:'Visit',fn:t=>`<a class="visit-link" href="${t.url}" target="_blank">Open tool ↗</a>`},
+  ];
+  let html=`<div class="comp-card"><div class="comp-card-head" style="display:grid;grid-template-columns:${colW}">
+    ${t2.map(t=>{const dc=domainColors[t.domain]||{dot:'#888780'};return `<div class="comp-head-cell"><div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:${dc.dot}"></div><span style="font-size:15px;font-weight:600;color:#111">${t.name}</span></div></div>`;}).join('')}
+  </div>`;
+  rows.forEach(r=>{
+    html+=`<div class="comp-row-label">${r.label}</div><div class="comp-row-values" style="display:grid;grid-template-columns:${colW}">${t2.map(t=>`<div class="comp-cell">${r.fn(t)}</div>`).join('')}</div>`;
+  });
+  html+='</div>';
+  document.getElementById('compContent').innerHTML=html;
+  showPage('comparePage');
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+document.getElementById('compareBtn').onclick=openComparePage;
+document.getElementById('backBtn').onclick=()=>showPage('mainPage');
+document.getElementById('clearCompare').onclick=()=>{selected=[];renderCompareBar();renderTable();};
+document.querySelectorAll('th.sortable').forEach(th=>{
+  th.addEventListener('click',()=>{
+    sortCol===th.dataset.col?sortDir*=-1:(sortCol=th.dataset.col,sortDir=1);
+    renderTable();
+  });
+});
+['search','domainFilter','skillFilter','tierFilter'].forEach(id=>document.getElementById(id).addEventListener('input',renderTable));
+renderPicks();renderTable();
+</script>
+</body>
+</html>
